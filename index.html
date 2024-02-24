@@ -34,8 +34,9 @@
         </div>
 
         <div class="pagination">
-            <button id="prevPlanetsBtn" onclick="navigateTo('planets')" disabled>Previous</button>
-            <button id="nextPlanetsBtn" onclick="navigateTo('planets')" disabled>Next</button>
+            <button id="prevPlanetsBtn" onclick="paginate('planets', 'prev')" disabled>Previous</button>
+            <button id="nextPlanetsBtn" onclick="paginate('planets', 'next')" disabled>Next</button>
+            
             
         </div>
     </section>
@@ -44,8 +45,8 @@
         <h2 class="h2-resident">Residents</h2>
         <div id="residents-container"></div>
         <div class="pagination">
-            <button id="prevResidentsBtn" onclick="navigateTo('people')" disabled>Previous</button>
-            <button id="nextResidentsBtn" onclick="navigateTo('people')" disabled>Next</button>
+            <button id="prevResidentsBtn" onclick="paginate('people', 'prev')" disabled>Previous</button>
+<button id="nextResidentsBtn" onclick="paginate('people', 'next')" disabled>Next</button>
 
         </div>
     </section>
