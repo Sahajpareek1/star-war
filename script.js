@@ -1,3 +1,4 @@
+const API_BASE_URL = "https://swapi.dev/api/";
 let currentPage = 1;
 const cachedData = {};
 
@@ -5,18 +6,30 @@ document.addEventListener("DOMContentLoaded", () => {
     showPage("main-page");
 });
 
-async function fetchData(url, type) {
-    if (cachedData[`${type}-${currentPage}`]) {
-        displayData(cachedData[`${type}-${currentPage}`], type);
-    } else {
+class SwapiDataFetcher {
+    static async fetchData(url) {
         try {
-            const response = await fetch(`${url}?format=json&page=${currentPage}`);
-            const data = await response.json();
-            cachedData[`${type}-${currentPage}`] = data;
-            displayData(data, type);
+            const response = await fetch(url);
+            return await response.json();
         } catch (error) {
-            console.error(`Error fetching ${type}:`, error);
+            console.error("Error fetching data:", error);
+            throw error; // Re-throw the error to be caught by the caller
         }
+    }
+}
+
+async function getData(url, type) {
+    const cachedKey = `${type}-${currentPage}`;
+    try {
+        if (cachedData[cachedKey]) {
+            return cachedData[cachedKey];
+        } else {
+            const data = await SwapiDataFetcher.fetchData(`${url}?format=json&page=${currentPage}`);
+            cachedData[cachedKey] = data;
+            return data;
+        }
+    } catch (error) {
+        throw error; // Re-throw the error to be caught by the caller
     }
 }
 
@@ -78,49 +91,56 @@ function updatePaginationButtons(type, data) {
     nextBtn.disabled = !data.next;
 }
 
-function showPeopleModal(planetUrl) {
+async function showPeopleModal(planetUrl) {
     const peopleContainer = document.getElementById("people-container");
     peopleContainer.innerHTML = "";
 
-    fetch(planetUrl)
-        .then(response => response.json())
-        .then(planet => {
-            if (planet.residents.length > 0) {
-                planet.residents.forEach(residentUrl => {
-                    fetch(residentUrl)
-                        .then(response => response.json())
-                        .then(resident => {
-                            const residentCard = createResidentCard(resident);
-                            peopleContainer.appendChild(residentCard);
-                        });
-                });
-            } else {
-                const noDataMessage = document.createElement("p");
-                noDataMessage.textContent = "No resident data available.";
-                peopleContainer.appendChild(noDataMessage);
-            }
+    try {
+        const planetResponse = await fetch(planetUrl);
+        const planet = await planetResponse.json();
 
-            document.getElementById("people-modal").style.display = "flex";
-        });
+        if (planet.residents.length > 0) {
+            for (const residentUrl of planet.residents) {
+                try {
+                    const residentResponse = await fetch(residentUrl);
+                    const resident = await residentResponse.json();
+                    const residentCard = createResidentCard(resident);
+                    peopleContainer.appendChild(residentCard);
+                } catch (residentError) {
+                    console.error(`Error fetching resident data:`, residentError);
+                }
+            }
+        } else {
+            const noDataMessage = document.createElement("p");
+            noDataMessage.textContent = "No resident data available.";
+            peopleContainer.appendChild(noDataMessage);
+        }
+
+        document.getElementById("people-modal").style.display = "flex";
+    } catch (planetError) {
+        console.error(`Error fetching planet data:`, planetError);
+    }
 }
 
 function closePeopleModal() {
     document.getElementById("people-modal").style.display = "none";
 }
 
-function navigateTo(type) {
+async function navigateTo(type) {
     showPage(`${type}-page`);
     currentPage = 1;
 
-    if (type === 'planets') {
-        fetchData("https://swapi.dev/api/planets", "planets");
-    } else if (type === 'people') {
-        fetchData("https://swapi.dev/api/people", "residents");
+    try {
+        const url = type === 'planets' ? `${API_BASE_URL}planets` : `${API_BASE_URL}people`;
+        const data = await getData(url, type);
+        displayData(data, type);
+    } catch (error) {
+        console.error(`Error navigating to ${type}:`, error);
     }
 }
 
 function showPage(pageId) {
-    const pages = document.querySelectorAll("main");
+    const pages = document.querySelectorAll("section");
     pages.forEach(page => {
         page.style.display = "none";
     });

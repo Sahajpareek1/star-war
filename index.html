@@ -11,7 +11,7 @@
         <img src="Star_Wars_Logo.svg.png" alt="Star Wars Logo">
     </header>
 
-    <main id="main-page">
+    <section id="main-page">
         <div class="center-buttons">
             <button onclick="navigateTo('planets')">
                 <img src="1.avif" alt="Planet Icon"> 
@@ -23,9 +23,9 @@
                 <p>People</p>
             </button>
         </div>
-    </main>
+    </section>
 
-    <main id="planets-page">
+    <section id="planets-page">
         <h2 class="h2-planet">Planets</h2>
         <div id="planets-container"></div>
         <div id="people-modal">
@@ -33,20 +33,20 @@
             <div id="people-container"></div>
         </div>
 
-        <div id="pagination">
-            <button id="prevBtn" onclick="getPlanets('prev')" disabled>Previous</button>
-            <button id="nextBtn" onclick="getPlanets('next')" disabled>Next</button>
+        <div class="pagination">
+            <button id="prevPlanetsBtn" onclick="getPlanets('prev')" disabled>Previous</button>
+            <button id="nextPlanetsBtn" onclick="getPlanets('next')" disabled>Next</button>
         </div>
-    </main>
+    </section>
 
-    <main id="people-page">
+    <section id="people-page">
         <h2 class="h2-resident">Residents</h2>
         <div id="residents-container"></div>
-        <div id="pagination">
+        <div class="pagination">
             <button id="prevResidentsBtn" onclick="getResidents('prev')" disabled>Previous</button>
             <button id="nextResidentsBtn" onclick="getResidents('next')" disabled>Next</button>
         </div>
-    </main>
+    </section>
 
     <script src="script.js"></script>
 </body>
